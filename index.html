@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edit Soul Studio</title>
+<meta name="description" content="Edit Soul Studio — a video studio in Nellore. Editing, AI videos, shoots and post-production for filmmakers. Walk through the studio.">
+<meta name="theme-color" content="#F1EEF7">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Manrope:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<div id="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <span class="loader-word">Edit <i>Soul</i></span>
+    <span class="loader-count" id="loaderCount">000</span>
+  </div>
+</div>
+
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="wordmark" href="#" data-go="0" aria-label="Edit Soul Studio, back to start">Edit <i>Soul</i><small>Studio</small></a>
+  <a class="topbar-cta" href="#" data-go="7">Begin a project</a>
+</header>
+
+<nav class="chapters" aria-label="Chapters">
+  <div class="rail"><div class="rail-fill" id="railFill"></div></div>
+  <ol id="chapterList"></ol>
+</nav>
+
+<main class="panels" id="panels">
+
+  <section class="panel center" data-ch="0">
+    <p class="eyebrow">A video studio · Nellore, Andhra Pradesh</p>
+    <h1 class="display">Edit <i>Soul</i></h1>
+    <p class="lead">We edit, shoot and generate films for brands, creators and filmmakers. What you are about to walk through is the studio itself.</p>
+    <p class="hint"><span class="hint-line"></span>Scroll to enter</p>
+  </section>
+
+  <section class="panel left" data-ch="1">
+    <p class="num">I</p>
+    <h2 class="display">The <i>Cut</i></h2>
+    <p class="lead">Video editing. Rhythm, color grading, sound design and titles. Every frame is placed on purpose, and the ones that don't belong are gone.</p>
+    <ul class="tags"><li>Color grading</li><li>Audio &amp; sound</li><li>Titles &amp; motion</li></ul>
+    <p class="aside">It starts with words. We also write scripts, hooks and captions.</p>
+  </section>
+
+  <section class="panel right" data-ch="2">
+    <p class="num">II</p>
+    <h2 class="display">The <i>Machine</i></h2>
+    <p class="lead">AI videos, animated and faceless content. We generate the footage, then editors shape it until it feels made, not prompted.</p>
+    <ul class="tags"><li>AI ads &amp; visuals</li><li>Faceless YouTube</li><li>Motion explainers</li></ul>
+    <p class="aside">We only use a real person's face or voice with their written permission.</p>
+  </section>
+
+  <section class="panel left" data-ch="3">
+    <p class="num">III</p>
+    <h2 class="display">The <i>Field</i></h2>
+    <p class="lead">Instant reels and professional shoots. Photography and videography for brands, products, events and people.</p>
+    <ul class="tags"><li>Instant reels</li><li>Photography</li><li>Videography</li></ul>
+    <p class="aside">Locations are chosen with you after you reach out.</p>
+  </section>
+
+  <section class="panel right" data-ch="4">
+    <p class="num">IV</p>
+    <h2 class="display">The <i>Screen</i></h2>
+    <p class="lead">A full studio partner for filmmakers. Short films and YouTube series, from the first assembly to the release trailer.</p>
+    <ul class="tags"><li>Edit &amp; assembly</li><li>Grade &amp; look</li><li>Sound &amp; mix</li><li>Titles &amp; trailers</li></ul>
+  </section>
+
+  <section class="panel center low" data-ch="5">
+    <p class="num">V</p>
+    <h2 class="display">The <i>Archive</i></h2>
+    <p class="lead">Selected work floats around you. Click a frame to watch.</p>
+    <ul class="worklist" id="workList"></ul>
+  </section>
+
+  <section class="panel left" data-ch="6">
+    <p class="num">VI</p>
+    <h2 class="display">The <i>Two</i></h2>
+    <p class="lead">You hire the studio. You also know exactly who is cutting your film.</p>
+    <div class="people">
+      <div class="person">
+        <h3>Kashyap</h3>
+        <p class="role">Co-founder · Editor &amp; colorist</p>
+        <p>Cinematic edits, masking transitions and color grading in DaVinci Resolve.</p>
+      </div>
+      <div class="person">
+        <h3>Yashu Singh</h3>
+        <p class="role">Co-founder · Editor</p>
+        <p>Edits client projects and reels, from first cut to final delivery.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel right contact" data-ch="7">
+    <p class="num">VII</p>
+    <h2 class="display">Step <i>through</i></h2>
+    <p class="lead">Tell us what you're making. The form opens WhatsApp with your message ready.</p>
+    <form id="brief" novalidate>
+      <div class="field"><label for="f-name">Your name</label><input id="f-name" autocomplete="name" placeholder="Ravi Kumar"></div>
+      <div class="field"><label for="f-svc">You need</label>
+        <select id="f-svc">
+          <option>Video editing</option>
+          <option>AI video</option>
+          <option>Animated or faceless video</option>
+          <option>Content writing</option>
+          <option>Instant reels shoot</option>
+          <option>Photo or video shoot</option>
+          <option>Studio partner for my film or series</option>
+          <option>Not sure yet</option>
+        </select>
+      </div>
+      <div class="field"><label for="f-msg">The idea</label><textarea id="f-msg" rows="3" placeholder="What it's for, how long, your deadline."></textarea></div>
+      <p class="err" id="formErr" hidden>Add your name and a line about the idea.</p>
+      <button type="submit" class="send">Continue on WhatsApp <span aria-hidden="true">↗</span></button>
+    </form>
+    <p class="direct"><a id="igLink" href="#" target="_blank" rel="noopener">@editsoulstudio.in</a><span>·</span><span id="waText"></span></p>
+  </section>
+
+</main>
+
+<div id="scroll" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"><span></span></div>
+<p class="frame-tip" id="frameTip" aria-hidden="true"></p>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
