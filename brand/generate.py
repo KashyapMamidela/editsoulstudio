@@ -6,8 +6,8 @@ from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.transformPen import TransformPen
 
-F = '/tmp/claude-0/-home-claude/5297088a-b257-595c-a07e-719dd621689e/scratchpad/t/f/'
-OUT = '/home/claude/editsoulstudio/brand'
+F = os.environ.get('FONT_DIR', 'fonts/')  # folder with the Anybody, Newsreader and Geist Mono .woff2 files
+OUT = os.path.dirname(os.path.abspath(__file__))
 os.makedirs(OUT, exist_ok=True)
 
 BLACK, WHITE, VIOLET, LILAC, PAPER = '#0B0A10', '#F7F6FB', '#5A2EFF', '#9C80FF', '#F7F6FB'

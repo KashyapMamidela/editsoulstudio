@@ -19,6 +19,24 @@ How the weave works: two transparent WebGL canvases render the same scene, one c
 Type: Anybody (variable width, display) · Newsreader italic (voice) · Geist (body) · Geist Mono (labels).
 Palette: white `#F7F6FB`, black `#0B0A10`, violet `#5A2EFF`.
 
+## Logos
+
+All logos are in `brand/` as SVGs with the text converted to shapes, so they look the same on any computer without installing fonts.
+
+| File | Use |
+| --- | --- |
+| `editsoul-wordmark.svg` | Main logo on light backgrounds |
+| `editsoul-wordmark-white.svg` | On dark backgrounds or photos |
+| `editsoul-wordmark-black.svg` | One color: stamps, watermarks, print |
+| `editsoul-wordmark-on-dark.svg` | White logo with its own black background |
+| `editsoul-stacked.svg` / `-white` | Big "edit SOUL" lockup for posters and video end cards |
+| `editsoul-badge.svg` / `-white` / `-black` | Round seal for stickers, watermarks and reel corners |
+| `editsoul-icon-violet.svg` | Instagram / WhatsApp profile picture |
+| `editsoul-icon-black.svg` / `-white` | Profile picture alternatives |
+| `favicon.svg` | Browser tab icon for the website |
+
+`brand/generate.py` rebuilds them from the font files if you change a color (`FONT_DIR=path/to/fonts python3 brand/generate.py`).
+
 ## Edit the content
 
 Open `js/main.js`. The top of the file has a clearly marked block:
@@ -59,6 +77,7 @@ index.html      page structure and chapter text
 css/style.css   type, layout, depth layers, cursor, mobile
 js/main.js      content, film reel (three.js), interactions
 build.mjs       makes a single-file copy in dist/ (optional)
+brand/          logos (SVG) and the script that generates them
 ```
 
 On phones the reel is smaller and frames open with a tap. If WebGL isn't available the page still works without it. Respects "reduce motion".
