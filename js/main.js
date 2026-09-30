@@ -1,6 +1,6 @@
 // Edit Soul Studio
-// One chrome "soul" lives between the giant type (behind) and the content (in front).
-// It moves to a new place for every section as you scroll.
+// A 3D film reel weaves through the giant type: behind some letters, in front of others.
+// Its frames are the work: hover pauses, click opens, scrolling scrubs.
 import * as THREE from 'three';
 
 /* ================= EDIT THESE ================= */
@@ -292,164 +292,226 @@ reveals.forEach(el => io.observe(el));
 setTimeout(() => reveals.forEach(el => { const r = el.getBoundingClientRect(); if (r.top < innerHeight) el.classList.add('in'); }), 120);
 setTimeout(() => reveals.forEach(el => el.classList.add('in')), 6000);
 
-/* ---------- The soul: chrome blob ---------- */
-const canvas = document.getElementById('gl');
-let renderer;
-try {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-} catch (e) { renderer = null; }
 
-if (renderer) {
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setClearColor(0x000000, 0);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+/* ---------- Marquee: what we make, drifting; scroll speeds it up and flips it ---------- */
+const mq = document.getElementById('mq');
+{
+  const words = [['Reels', 'for cafés'], ['Short films', 'graded'], ['AI video', 'made, not prompted'], ['YouTube', 'cut for watch time'], ['Shoots', 'on location'], ['Scripts', 'words first']];
+  const one = words.map(([a, b]) => `<span>${a}</span><em>${b}</em><i>✳</i>`).join('');
+  mq.innerHTML = one + one;
+}
+const mqState = { x: 0, dir: 1, last: scrollY };
+
+/* ---------- Chooser peek: a frame follows the cursor over the list ---------- */
+const peek = document.getElementById('peek');
+const peekCanvas = peek.querySelector('canvas');
+const PEEK_STILL = [1, 4, 2, 3, 5, 0];
+const pk = { x: 0, y: 0, vx: 0, on: false, idx: -1 };
+choicesEl.querySelectorAll('.choice-row').forEach((row, i) => {
+  row.addEventListener('pointerenter', () => {
+    if (!finePointer) return;
+    if (pk.idx !== i) { paintStill(peekCanvas, PEEK_STILL[i] ?? i); pk.idx = i; }
+    pk.on = true; peek.classList.add('on');
+  });
+  row.addEventListener('pointerleave', () => { pk.on = false; peek.classList.remove('on'); });
+});
+
+/* ---------- Work cards tilt toward the cursor ---------- */
+document.querySelectorAll('.card').forEach(card => {
+  const still = card.querySelector('.still');
+  card.addEventListener('pointermove', e => {
+    const r = still.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+    still.style.setProperty('--ry', (px * 10).toFixed(2) + 'deg');
+    still.style.setProperty('--rx', (-py * 10).toFixed(2) + 'deg');
+  });
+  card.addEventListener('pointerleave', () => { still.style.setProperty('--rx', '0deg'); still.style.setProperty('--ry', '0deg'); });
+});
+
+const badgeSvg = document.querySelector('.badge svg');
+const reelTip = document.getElementById('reelTip');
+
+/* ---------- The reel: a 3D film strip that weaves through the giant type ----------
+   Two canvases share one scene: the back one draws everything behind the type (z < 0),
+   the front one everything in front (z > 0). So the strip passes behind some letters
+   and in front of others. Its frames are the WORK list: hover pauses, click opens. */
+const glBack = document.getElementById('glBack');
+const glFront = document.getElementById('glFront');
+let rBack = null, rFront = null;
+try {
+  rBack = new THREE.WebGLRenderer({ canvas: glBack, antialias: true, alpha: true });
+  rFront = new THREE.WebGLRenderer({ canvas: glFront, antialias: true, alpha: true });
+} catch (e) { rBack = rFront = null; document.documentElement.classList.add('no-gl'); }
+
+const reel = { hover: -1, hoverTitle: '' };
+
+if (rBack && rFront) {
+  for (const r of [rBack, rFront]) {
+    r.setPixelRatio(Math.min(devicePixelRatio, 2));
+    r.setSize(innerWidth, innerHeight);
+    r.setClearColor(0x000000, 0);
+    r.localClippingEnabled = false;
+  }
+  rBack.clippingPlanes = [new THREE.Plane(new THREE.Vector3(0, 0, -1), 0)];  // keep z <= 0
+  rFront.clippingPlanes = [new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)];  // keep z >= 0
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.1, 100);
   camera.position.set(0, 0, 12);
+  const halfH = Math.tan(THREE.MathUtils.degToRad(15)) * 12;
 
-  // A studio built only from white, black and violet light — chrome reflects nothing else.
-  function studioEnv() {
-    const s = new THREE.Scene();
-    const box = new THREE.Mesh(new THREE.BoxGeometry(30, 30, 30), new THREE.MeshBasicMaterial({ color: 0xE9E6F3, side: THREE.BackSide }));
-    s.add(box);
-    const panel = (w, h, color, intensity, pos, rot) => {
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide }));
-      m.position.set(...pos); m.rotation.set(...rot); s.add(m);
-    };
-    panel(30, 30, 0x0B0A10, 1, [0, -12, 0], [-Math.PI / 2, 0, 0]);           // black floor
-    panel(22, 6, 0xFFFFFF, 3.2, [0, 13, 0], [Math.PI / 2, 0, 0]);            // soft box above
-    panel(8, 26, 0x5A2EFF, 2.4, [-13, 0, 2], [0, Math.PI / 2, 0]);           // violet wall left
-    panel(3, 26, 0x0B0A10, 1, [13, 0, -4], [0, -Math.PI / 2, 0]);            // black strips right
-    panel(2, 26, 0x0B0A10, 1, [13, 0, 4], [0, -Math.PI / 2, 0]);
-    panel(6, 20, 0xFFFFFF, 2.2, [13, 0, 0], [0, -Math.PI / 2, 0]);           // white strip right
-    panel(14, 4, 0x8A66FF, 1.6, [0, 4, -13], [0, 0, 0]);                     // violet band behind
-    panel(30, 10, 0x0B0A10, 1, [0, -6, 13], [0, Math.PI, 0]);                // dark band in front
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    const tex = pmrem.fromScene(s, 0.035).texture;
-    pmrem.dispose();
-    return tex;
+  // Film atlas: one frame per WORK item, with sprocket holes and edge numbers
+  const FW = 512, FH = 384, PIC_H = 288, PAD = 48;
+  const atlas = document.createElement('canvas');
+  atlas.width = FW * WORK.length; atlas.height = FH;
+  const ax = atlas.getContext('2d');
+  const tex = new THREE.CanvasTexture(atlas);
+  tex.wrapS = THREE.RepeatWrapping; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  function drawFrame(i, img) {
+    const x0 = i * FW;
+    ax.fillStyle = '#0B0A10'; ax.fillRect(x0, 0, FW, FH);
+    // sprocket holes
+    ax.fillStyle = '#F7F6FB';
+    for (let k = 0; k < 8; k++) {
+      const hx = x0 + 14 + k * 64;
+      ax.beginPath(); ax.roundRect(hx, 12, 30, 22, 4); ax.fill();
+      ax.beginPath(); ax.roundRect(hx, FH - 34, 30, 22, 4); ax.fill();
+    }
+    // picture
+    const px = x0 + 16, py = PAD, pw = FW - 32, ph = PIC_H;
+    if (img) {
+      const s = Math.max(pw / img.width, ph / img.height);
+      const w = img.width * s, h = img.height * s;
+      ax.save(); ax.beginPath(); ax.rect(px, py, pw, ph); ax.clip();
+      ax.drawImage(img, px + (pw - w) / 2, py + (ph - h) / 2, w, h); ax.restore();
+    } else {
+      const c = document.createElement('canvas'); c.width = pw; c.height = ph;
+      paintStill(c, i); ax.drawImage(c, px, py);
+    }
+    // edge label
+    ax.fillStyle = '#F7F6FB'; ax.font = '500 15px "Geist Mono", monospace';
+    ax.fillText(String(i + 1).padStart(2, '0') + ' — ' + WORK[i].title.toUpperCase(), px + 12, py + ph - 14);
+    tex.needsUpdate = true;
   }
-  const env = studioEnv();
-
-  const NOISE = `
-  vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
-  vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
-  vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
-  vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-  float snoise(vec3 v){
-    const vec2 C=vec2(1.0/6.0,1.0/3.0); const vec4 D=vec4(0.0,0.5,1.0,2.0);
-    vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
-    vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.0-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
-    vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy; i=mod289(i);
-    vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
-    float n_=0.142857142857; vec3 ns=n_*D.wyz-D.xzx; vec4 j=p-49.0*floor(p*ns.z*ns.z);
-    vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.0*x_); vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.0-abs(x)-abs(y);
-    vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw); vec4 s0=floor(b0)*2.0+1.0; vec4 s1=floor(b1)*2.0+1.0; vec4 sh=-step(h,vec4(0.0));
-    vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-    vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
-    vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3))); p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
-    vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0); m=m*m;
-    return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-  }
-  uniform float uTime; uniform float uAmp; uniform float uTwist;
-  vec3 warp(vec3 p){
-    // twist around Y, then a slow liquid swell
-    float a = p.y * uTwist;
-    p.xz = mat2(cos(a), -sin(a), sin(a), cos(a)) * p.xz;
-    float n = snoise(p * 0.75 + vec3(0.0, uTime * 0.2, uTime * 0.14));
-    float n2 = snoise(p * 1.9 - uTime * 0.25) * 0.12;
-    return p + normalize(p) * (n + n2) * uAmp;
-  }`;
-
-  const uniforms = { uTime: { value: 0 }, uAmp: { value: 0.32 }, uTwist: { value: 0.6 } };
-  const mat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff, metalness: 1, roughness: 0.07, envMap: env, envMapIntensity: 1.15,
-    clearcoat: 1, clearcoatRoughness: 0.06, iridescence: 0.55, iridescenceIOR: 1.35, iridescenceThicknessRange: [120, 420],
+  WORK.forEach((w, i) => {
+    drawFrame(i);
+    if (w.thumb) { const im = new Image(); im.onload = () => drawFrame(i, im); im.src = w.thumb; }
   });
-  mat.onBeforeCompile = shader => {
-    Object.assign(shader.uniforms, uniforms);
-    shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\n' + NOISE)
-      .replace('#include <beginnormal_vertex>', `
-        vec3 sp = normalize(position);
-        vec3 tA = normalize(cross(sp, abs(sp.y) < 0.99 ? vec3(0.0,1.0,0.0) : vec3(1.0,0.0,0.0)));
-        vec3 tB = normalize(cross(sp, tA));
-        float eps = 0.012;
-        vec3 wp = warp(position);
-        vec3 w1 = warp(normalize(position + tA * eps) * length(position));
-        vec3 w2 = warp(normalize(position + tB * eps) * length(position));
-        vec3 objectNormal = normalize(cross(w1 - wp, w2 - wp));
-        if (dot(objectNormal, wp) < 0.0) objectNormal = -objectNormal;
-        #ifdef USE_TANGENT
-          vec3 objectTangent = vec3(tangent.xyz);
-        #endif`)
-      .replace('#include <begin_vertex>', 'vec3 transformed = wp;');
-  };
-  const detail = innerWidth < 820 ? 64 : 120;
-  const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(1, detail), mat);
-  scene.add(blob);
+  document.fonts?.ready.then(() => WORK.forEach((w, i) => { if (!w.thumb) drawFrame(i); }));
 
-  // Keyframes from each section's data-blob="x,y,scale,energy" (x,y in screen halves: -1..1)
-  const sections = [...document.querySelectorAll('[data-blob]')];
-  const keysDesk = sections.map(s => s.dataset.blob.split(',').map(Number));
-  // phones: the sculpture becomes a small companion in the top-right corner unless a section says otherwise
-  const keysMob = sections.map((s, i) => s.dataset.blobM ? s.dataset.blobM.split(',').map(Number) : [0.62, 0.66, 0.3, keysDesk[i][3]]);
-  let keys = innerWidth < 820 ? keysMob : keysDesk;
-  addEventListener('resize', () => { keys = innerWidth < 820 ? keysMob : keysDesk; });
-  const state = { x: keys[0][0], y: keys[0][1], s: keys[0][2], e: keys[0][3] };
+  const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide, transparent: true });
+  let strip = null, stripLen = 1, stripH = 1;
 
-  function targetKey() {
-    const mid = scrollY + innerHeight * 0.5;
-    let i = 0;
-    for (let k = 0; k < sections.length; k++) if (sections[k].offsetTop <= mid) i = k;
-    const sec = sections[i], next = keys[i + 1] || keys[i];
-    const t = THREE.MathUtils.clamp((mid - sec.offsetTop) / sec.offsetHeight, 0, 1);
-    const f = THREE.MathUtils.smoothstep(t, 0.6, 1.0);
-    const a = keys[i];
-    return a.map((v, j) => v + (next[j] - v) * f);
+  // The path is written in screen units (x: -1..1 of half width, y: -1..1 of half height).
+  const PATH = [[-1.5, -0.35, -2.4], [-0.95, 0.22, 1.9], [-0.35, -0.12, -2.2], [0.2, 0.2, 2.0], [0.75, -0.18, -1.9], [1.5, 0.3, 2.2]];
+  function build() {
+    if (strip) { scene.remove(strip); strip.geometry.dispose(); }
+    const aspect = innerWidth / innerHeight, halfW = halfH * aspect;
+    const mob = innerWidth < 820;
+    const pts = PATH.map(([x, y, z]) => new THREE.Vector3(x * halfW, y * halfH * (mob ? 0.55 : 1), z * (mob ? 0.7 : 1)));
+    const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
+    stripLen = curve.getLength();
+    stripH = halfH * (mob ? 0.2 : 0.36);
+    const frameW = stripH * FW / FH;
+    const repeats = stripLen / (frameW * WORK.length);
+    const M = 700;
+    const pos = new Float32Array((M + 1) * 2 * 3), uv = new Float32Array((M + 1) * 2 * 2);
+    const idx = [];
+    const Z = new THREE.Vector3(0, 0, 1);
+    for (let i = 0; i <= M; i++) {
+      const u = i / M;
+      const p = curve.getPointAt(u), T = curve.getTangentAt(u);
+      const B0 = new THREE.Vector3().crossVectors(Z, T).normalize();
+      const N0 = new THREE.Vector3().crossVectors(T, B0).normalize();
+      const twist = Math.sin(u * Math.PI * 2.2 + 0.6) * 0.75;
+      const side = B0.multiplyScalar(Math.cos(twist)).add(N0.multiplyScalar(Math.sin(twist))).multiplyScalar(stripH / 2);
+      pos.set([p.x + side.x, p.y + side.y, p.z + side.z, p.x - side.x, p.y - side.y, p.z - side.z], i * 6);
+      uv.set([u * repeats, 1, u * repeats, 0], i * 4);
+      if (i < M) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    strip = new THREE.Mesh(g, mat);
+    strip.userData.repeats = repeats;
+    scene.add(strip);
+  }
+  build();
+
+  // Which giant word should the reel weave through right now?
+  const anchors = [...document.querySelectorAll('[data-reel]')];
+  function anchorY() {
+    let best = null, bestD = Infinity;
+    for (const el of anchors) {
+      const r = el.getBoundingClientRect();
+      const c = r.top + r.height / 2;
+      const d = Math.abs(c - innerHeight / 2);
+      if (d < bestD) { bestD = d; best = c; }
+    }
+    if (best === null || bestD > innerHeight * 1.2) return null;
+    return -((best - innerHeight / 2) / innerHeight) * 2 * halfH;
   }
 
-  function resize() {
+  const ray = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  let speed = 0.05, lastScroll = scrollY, scrub = 0;
+  function pickAt(cx, cy) {
+    if (!strip || !strip.visible) return -1;
+    ndc.set(cx / innerWidth * 2 - 1, -(cy / innerHeight) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObject(strip)[0];
+    if (!hit || !hit.uv) return -1;
+    const f = ((hit.uv.x + tex.offset.x) % 1 + 1) % 1;
+    return Math.min(WORK.length - 1, Math.floor(f * WORK.length));
+  }
+  addEventListener('click', e => {
+    if (e.target.closest('a, button, input, select, textarea, label, .brief, .strip')) return;
+    const i = pickAt(e.clientX, e.clientY);
+    if (i >= 0) openLink(WORK[i].link);
+  });
+
+  addEventListener('resize', () => {
+    for (const r of [rBack, rFront]) r.setSize(innerWidth, innerHeight);
     camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-  }
-  addEventListener('resize', resize);
+    build();
+  });
 
   const clock = new THREE.Clock();
-  const halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
-  let spin = 0;
-  const tick = () => {
+  const loop = () => {
     const dt = Math.min(clock.getDelta(), 0.05);
-    const time = clock.elapsedTime;
-    const k = targetKey();
-    const ease = reduceMotion ? 1 : Math.min(1, dt * 2.6);
-    state.x += (k[0] - state.x) * ease; state.y += (k[1] - state.y) * ease;
-    state.s += (k[2] - state.s) * ease; state.e += (k[3] - state.e) * ease;
+    const t = clock.elapsedTime;
+    const y = anchorY();
+    strip.visible = y !== null;
+    if (strip.visible) {
+      strip.position.y = y;
+      strip.rotation.x = mouse.ny * 0.08 + Math.sin(t * 0.3) * 0.03;
+      strip.rotation.y = mouse.nx * 0.12;
 
-    const aspect = innerWidth / innerHeight;
-    const halfW = halfH * aspect;
-    const mob = innerWidth < 820;
-    // phones: keep the sculpture in the top half, smaller, nearer the center
-    const x = state.x, y = state.y;
-    const radius = state.s * halfH * 0.5 * (mob ? Math.min(1, aspect * 1.6) : Math.min(1, aspect / 1.2 + 0.25));
+      // scrolling scrubs the reel, hovering a frame pauses it
+      const ds = scrollY - lastScroll; lastScroll = scrollY;
+      scrub += (ds / innerHeight) * 0.5;
+      scrub *= 0.9;
+      const target = reel.hover >= 0 ? 0 : (reduceMotion ? 0.01 : 0.045);
+      speed += (target - speed) * Math.min(1, dt * 4);
+      tex.offset.x -= (speed * dt + scrub * 0.2);
 
-    blob.position.set(x * halfW + mouse.nx * 0.25, y * halfH + mouse.ny * 0.2 + Math.sin(time * 0.6) * 0.06, 0);
-    blob.scale.setScalar(Math.max(radius, 0.001));
-    spin += dt * (0.12 + mouse.speed * 0.8);
-    blob.rotation.set(Math.sin(time * 0.3) * 0.25 + mouse.ny * 0.3, spin + mouse.nx * 0.4, 0);
-
-    uniforms.uTime.value = time * (reduceMotion ? 0.2 : 1);
-    uniforms.uAmp.value = 0.16 + state.e * 0.16 + mouse.speed * 0.22;
-    uniforms.uTwist.value = 0.35 + state.e * 0.45 + Math.sin(time * 0.4) * 0.15;
-    mouse.speed *= 0.95;
-
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
+      // hover
+      reel.hover = finePointer ? pickAt(mouse.x, mouse.y) : -1;
+      rBack.render(scene, camera);
+      rFront.render(scene, camera);
+    } else {
+      reel.hover = -1;
+      rBack.clear(); rFront.clear();
+    }
+    // cursor label follows the reel
+    if (reel.hover >= 0) { cursorLabel.textContent = 'Watch'; cursor.classList.add('on', 'reel'); }
+    else if (cursor.classList.contains('reel')) { cursor.classList.remove('on', 'reel'); }
+    reelTip.textContent = reel.hover >= 0 ? WORK[reel.hover].title + (WORK[reel.hover].sample ? ' · sample' : '') : '';
+    reelTip.classList.toggle('on', reel.hover >= 0);
+    requestAnimationFrame(loop);
   };
-  requestAnimationFrame(tick);
+  requestAnimationFrame(loop);
 }
 
 /* ---------- Per-frame DOM work ---------- */
@@ -461,6 +523,24 @@ const domTick = () => {
   const p = Math.min(1, scrollY / innerHeight);
   heroWord.style.transform = `translateY(${p * 12}vh) scaleY(${1 - p * 0.25})`;
   heroWord.style.transformOrigin = '50% 100%';
+
+  // marquee
+  const ds = scrollY - mqState.last; mqState.last = scrollY;
+  if (ds !== 0) mqState.dir = ds > 0 ? 1 : -1;
+  if (!reduceMotion) {
+    mqState.x -= (0.6 + Math.min(12, Math.abs(ds) * 0.4)) * mqState.dir;
+    const half = mq.scrollWidth / 2;
+    if (half > 0) { if (mqState.x <= -half) mqState.x += half; if (mqState.x > 0) mqState.x -= half; }
+    mq.style.transform = `translate3d(${mqState.x}px,0,0)`;
+  }
+  // badge turns with the page
+  if (badgeSvg) badgeSvg.style.transform = `rotate(${(scrollY * 0.25 + performance.now() * (reduceMotion ? 0 : 0.008)) % 360}deg)`;
+  // peek follows the cursor with a little lag and leans into the motion
+  const nx = pk.x + (mouse.x - pk.x) * 0.16; pk.vx = nx - pk.x; pk.x = nx;
+  pk.y += (mouse.y - pk.y) * 0.16;
+  peek.style.transform = `translate(${pk.x + 28}px, ${pk.y - 80}px) rotate(${Math.max(-12, Math.min(12, pk.vx * 0.6))}deg)`;
+  // reel tip sits beside the cursor
+  reelTip.style.transform = `translate(${cur.x + 48}px, ${cur.y - 16}px)`;
   requestAnimationFrame(domTick);
 };
 requestAnimationFrame(domTick);

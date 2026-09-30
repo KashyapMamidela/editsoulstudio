@@ -4,12 +4,15 @@ Website for **Edit Soul Studio**, a video studio in Nellore, Andhra Pradesh: edi
 
 ## The idea
 
-A white page with type in two depths. Giant words sit **behind** a liquid-chrome sculpture (the "soul"), and the content sits **in front** of it. The chrome reflects a studio lit only with white, black and violet, so it always stays on palette. As you scroll, the sculpture moves to a new spot in every section.
+A white page where a 3D **film reel** weaves through giant type: it passes behind some letters and in front of others. The reel is the showreel: its frames are the projects in `WORK`. Hover a frame to pause it, click to watch the video, and scroll to scrub it like a timeline. It appears through `SOUL` at the top and again through `LET'S MAKE IT` at the end.
 
-- **Hero:** a huge variable-width `SOUL`. Letters near the cursor thin out and turn violet, as if light is passing through them.
-- **What are you making?** The client picks their project (reel, YouTube, short film, AI video, shoot, writing) and sees exactly what they get and what you need from them. "Start this project" pre-fills the contact form.
-- **The work:** a draggable strip of frames.
-- **Process:** four steps from first message to final files.
+How the weave works: two transparent WebGL canvases render the same scene, one clipped to everything behind the type and one to everything in front, with the HTML type sandwiched between them.
+
+- **Hero:** a huge variable-width `SOUL`. Letters near the cursor thin out and turn violet. A rotating badge takes you to the services.
+- **Marquee:** what the studio makes, drifting; scrolling speeds it up and flips its direction.
+- **What are you making?** A frame follows the cursor over the list. The client picks their project (reel, YouTube, short film, AI video, shoot, writing) and sees exactly what they get and what you need from them. "Start this project" pre-fills the contact form.
+- **The work:** a draggable strip of frames that tilt toward the cursor.
+- **Process:** four steps from first message to final files. Key words get hand-drawn circles and underlines as they appear.
 - **Team:** Kashyap and Yashu Singh.
 - **Contact:** a form over a giant `LET'S MAKE IT` that opens WhatsApp with the message ready.
 
@@ -27,7 +30,7 @@ const CHOICES = [...]  // the 'What are you making?' options
 const WORK = [...]     // frames in the work strip
 ```
 
-Section text lives in `index.html`. Each section's `data-blob="x,y,scale,energy"` sets where the chrome sculpture sits (x and y from -1 to 1 across the screen).
+Section text lives in `index.html`. To put a real thumbnail on a reel frame, add `thumb: 'media/your-image.jpg'` to that item in `WORK` and put the image in a `media/` folder.
 
 ## Run locally
 
@@ -54,8 +57,8 @@ For the domain `editsoulstudio.in`: add it under **Settings → Pages → Custom
 ```
 index.html      page structure and chapter text
 css/style.css   type, layout, depth layers, cursor, mobile
-js/main.js      content, chrome sculpture (three.js), interactions
+js/main.js      content, film reel (three.js), interactions
 build.mjs       makes a single-file copy in dist/ (optional)
 ```
 
-On phones the sculpture becomes a small companion in the corner. If WebGL isn't available the page still works without it. Respects "reduce motion".
+On phones the reel is smaller and frames open with a tap. If WebGL isn't available the page still works without it. Respects "reduce motion".

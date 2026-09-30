@@ -20,7 +20,10 @@
 </head>
 <body>
 
-<canvas id="gl" aria-hidden="true"></canvas>
+<canvas id="glBack" class="gl" aria-hidden="true"></canvas>
+<canvas id="glFront" class="gl" aria-hidden="true"></canvas>
+<p class="reel-tip" id="reelTip" aria-hidden="true"></p>
+<div class="peek" id="peek" aria-hidden="true"><canvas width="360" height="240"></canvas></div>
 <div class="grain" aria-hidden="true"></div>
 <div class="cursor" id="cursor" aria-hidden="true"><span class="c-dot"></span><span class="c-label" id="cursorLabel"></span></div>
 
@@ -35,32 +38,39 @@
 <main>
 
 <!-- HERO -->
-<section class="hero" id="top" data-blob="0.2,0.02,0.95,1" data-blob-m="0.32,0.4,0.62,1">
-  <div class="back" aria-hidden="true">
+<section class="hero" id="top">
+  <div class="back" aria-hidden="true" data-reel>
     <div class="giant" id="heroWord" data-fit>SOUL</div>
   </div>
   <div class="front hero-front">
     <p class="meta hero-meta-top"><span>Video studio</span><span>Nellore, Andhra Pradesh</span></p>
     <h1 class="hero-title">
-      <span class="voice reveal">Your footage already has a feeling in it.</span>
+      <span class="voice reveal">Your footage already has a <span class="mark">feeling<svg class="scrib under" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4,20 C62,8 128,26 196,14 C236,7 270,12 296,9"/></svg></span> in it.</span>
       <span class="hero-sub reveal">We edit, shoot and generate video that makes people feel it too — for brands, creators and filmmakers.</span>
     </h1>
     <div class="hero-actions reveal">
       <a class="pill dark" href="#make" data-cursor="Go">What are you making? <span aria-hidden="true">↓</span></a>
       <a class="text-link" href="#work">See the work</a>
     </div>
+    <a class="badge" href="#make" data-cursor="Start" aria-label="Start: what are you making?">
+      <svg viewBox="0 0 200 200" aria-hidden="true"><defs><path id="badgeCirc" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0"/></defs>
+        <text><textPath href="#badgeCirc" textLength="495">EDIT · SHOOT · GENERATE · EDIT SOUL STUDIO · </textPath></text></svg>
+      <span class="badge-core" aria-hidden="true">✳</span>
+    </a>
     <div class="hero-foot meta">
-      <span>Editing</span><span>AI video</span><span>Shoots</span><span>Film post-production</span><span class="scroll-cue">Scroll</span>
+      <span>Editing</span><span>AI video</span><span>Shoots</span><span>Film post-production</span><span class="scroll-cue reel-hint"><b class="rh-desk">The reel: hover to pause, click to watch</b><b class="rh-touch">The reel: tap a frame to watch</b></span>
     </div>
   </div>
 </section>
 
+<div class="marquee front" aria-hidden="true"><div class="mq-track" id="mq"></div></div>
+
 <!-- CHOOSER -->
-<section class="make" id="make" data-blob="0.74,0.28,0.44,0.55">
+<section class="make" id="make">
   <div class="front">
     <header class="sec-head">
       <p class="meta">01 — Start with you</p>
-      <h2 class="h2">What are you <em>making?</em></h2>
+      <h2 class="h2">What are you <em class="mark">making?<svg class="scrib circle" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M40,78 C12,52 60,14 150,10 C236,6 294,34 288,66 C282,100 196,116 120,112 C54,108 8,88 20,60 C30,38 76,22 118,18"/></svg></em></h2>
       <p class="voice sm">Pick one. You'll see exactly what you get and what we need from you.</p>
     </header>
     <ol class="choices" id="choices"></ol>
@@ -68,7 +78,7 @@
 </section>
 
 <!-- WORK -->
-<section class="work" id="work" data-blob="0.6,0.55,0.3,0.35">
+<section class="work" id="work">
   <div class="front">
     <header class="sec-head row">
       <div>
@@ -82,11 +92,11 @@
 </section>
 
 <!-- PROCESS -->
-<section class="process" id="process" data-blob="0.74,0.6,0.26,0.45">
+<section class="process" id="process">
   <div class="front">
     <header class="sec-head">
       <p class="meta">03 — After you message us</p>
-      <h2 class="h2">Four steps. <em>No guesswork.</em></h2>
+      <h2 class="h2">Four steps. <em class="mark">No guesswork.<svg class="scrib under" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4,20 C62,8 128,26 196,14 C236,7 270,12 296,9"/></svg></em></h2>
     </header>
     <ol class="steps">
       <li><span class="step-n">01</span><h3>You message us</h3><p>On WhatsApp or Instagram. Tell us the idea, even if it's rough.</p></li>
@@ -98,11 +108,11 @@
 </section>
 
 <!-- TEAM -->
-<section class="team" id="team" data-blob="0.62,0.5,0.32,0.4">
+<section class="team" id="team">
   <div class="front">
     <header class="sec-head">
       <p class="meta">04 — Who cuts your video</p>
-      <h2 class="h2">Two editors. <em>One studio.</em></h2>
+      <h2 class="h2">Two editors. <em class="mark">One studio.<svg class="scrib under" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4,20 C62,8 128,26 196,14 C236,7 270,12 296,9"/></svg></em></h2>
     </header>
     <div class="people">
       <article class="person">
@@ -126,8 +136,8 @@
 </section>
 
 <!-- CONTACT -->
-<section class="contact" id="contact" data-blob="0.5,0.05,0.75,1" data-blob-m="0.5,0.5,0.5,1">
-  <div class="back" aria-hidden="true">
+<section class="contact" id="contact">
+  <div class="back" aria-hidden="true" data-reel>
     <div class="giant sm" data-fit>LET'S</div>
     <div class="giant sm" data-fit>MAKE IT</div>
   </div>
