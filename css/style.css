@@ -50,6 +50,7 @@ section, .marquee, main { position: relative; }
   padding: calc(env(safe-area-inset-top, 0px) + 18px) var(--gutter) 22px;
   background: linear-gradient(var(--white) 55%, rgba(247,246,251,0)); }
 .brand { font: 800 1.15rem/1 var(--f-display); font-variation-settings: "wdth" 70; letter-spacing: -.01em; text-decoration: none; text-transform: uppercase; display: inline-flex; align-items: baseline; }
+.brand-mark { width: 1.35em; height: 1.35em; margin-right: .5em; align-self: center; flex: none; }
 .brand em { font: italic 400 1.2rem var(--f-voice); text-transform: none; color: var(--violet); margin-left: .12em; letter-spacing: 0; font-variation-settings: normal; }
 .brand sup { font: 500 .52rem var(--f-mono); letter-spacing: .18em; margin-left: .45em; color: var(--grey); vertical-align: top; font-variation-settings: normal; }
 .links { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.72); backdrop-filter: blur(12px); border: 1px solid var(--line); }

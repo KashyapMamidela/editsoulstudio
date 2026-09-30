@@ -21,21 +21,24 @@ Palette: white `#F7F6FB`, black `#0B0A10`, violet `#5A2EFF`.
 
 ## Logos
 
-All logos are in `brand/` as SVGs with the text converted to shapes, so they look the same on any computer without installing fonts.
+The mark is **the cut**: a ring (the soul) sliced by one edit. The two halves slide apart and read as an **S**, with the violet cut line between them. The wordmark repeats the same move: `EDIT` sits high, `SOUL` drops low, and the cut runs between them.
+
+All files are in `brand/` as SVGs with text converted to shapes, so they look identical everywhere without installing fonts.
 
 | File | Use |
 | --- | --- |
-| `editsoul-wordmark.svg` | Main logo on light backgrounds |
-| `editsoul-wordmark-white.svg` | On dark backgrounds or photos |
-| `editsoul-wordmark-black.svg` | One color: stamps, watermarks, print |
-| `editsoul-wordmark-on-dark.svg` | White logo with its own black background |
-| `editsoul-stacked.svg` / `-white` | Big "edit SOUL" lockup for posters and video end cards |
-| `editsoul-badge.svg` / `-white` / `-black` | Round seal for stickers, watermarks and reel corners |
+| `editsoul-logo.svg` / `-white` | Main logo: mark + name. Website, letterheads, invoices |
+| `editsoul-logo-stacked.svg` / `-white` | Posters, video end cards, square spaces |
+| `editsoul-wordmark.svg` / `-white` | Name only, when the mark is already nearby |
+| `editsoul-mark.svg` / `-white` / `-violet` | The symbol alone: watermarks, stickers, reel corners |
+| `editsoul-mark-animated.svg` / `-white` | Animated intro: ring closes, the cut slices it, the S appears (loops) |
+| `editsoul-seal.svg` / `-white` | Round seal with text, for stamps and merch |
 | `editsoul-icon-violet.svg` | Instagram / WhatsApp profile picture |
 | `editsoul-icon-black.svg` / `-white` | Profile picture alternatives |
-| `favicon.svg` | Browser tab icon for the website |
+| `favicon.svg` | Browser tab icon |
 
-`brand/generate.py` rebuilds them from the font files if you change a color (`FONT_DIR=path/to/fonts python3 brand/generate.py`).
+Colors: black `#0B0A10`, violet `#5A2EFF`, lilac `#9C80FF` (violet on dark backgrounds), white `#F7F6FB`.
+Rebuild after changing colors: `FONT_DIR=path/to/woff2 python3 brand/generate.py`.
 
 ## Edit the content
 
