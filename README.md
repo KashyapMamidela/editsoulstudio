@@ -21,24 +21,26 @@ Palette: white `#F7F6FB`, black `#0B0A10`, violet `#5A2EFF`.
 
 ## Logos
 
-The mark is **the cut**: a ring (the soul) sliced by one edit. The two halves slide apart and read as an **S**, with the violet cut line between them. The wordmark repeats the same move: `EDIT` sits high, `SOUL` drops low, and the cut runs between them.
+**The playhead i.** In `editsoul`, the **i** is a violet vertical line. A video editor's playhead and a code editor's text cursor are the same shape, so the one letter stands for both sides of the company:
 
-All files are in `brand/` as SVGs with text converted to shapes, so they look identical everywhere without installing fonts.
+- **Edit Soul Studio** (content): the i wears a **playhead head** (flat top, pointed bottom).
+- **Edit Soul Systems** (software): the i wears a **cursor block**.
+
+"edit" is set light and "soul" bold, in Geist. The logos are in `brand/` as SVGs with text converted to shapes, so they look identical everywhere.
 
 | File | Use |
 | --- | --- |
-| `editsoul-logo.svg` / `-white` | Main logo: mark + name. Website, letterheads, invoices |
-| `editsoul-logo-stacked.svg` / `-white` | Posters, video end cards, square spaces |
-| `editsoul-wordmark.svg` / `-white` | Name only, when the mark is already nearby |
-| `editsoul-mark.svg` / `-white` / `-violet` | The symbol alone: watermarks, stickers, reel corners |
-| `editsoul-mark-animated.svg` / `-white` | Animated intro: ring closes, the cut slices it, the S appears (loops) |
-| `editsoul-seal.svg` / `-white` | Round seal with text, for stamps and merch |
-| `editsoul-icon-violet.svg` | Instagram / WhatsApp profile picture |
-| `editsoul-icon-black.svg` / `-white` | Profile picture alternatives |
+| `editsoul-logo.svg` / `-white` | Parent logo with "STUDIO · SYSTEMS": website footer, invoices, letterheads |
+| `editsoul-wordmark.svg` / `-white` | Name only: website header, watermarks, small spaces |
+| `editsoul-studio.svg` / `-white` | Content division: reels, end cards, Instagram |
+| `editsoul-systems.svg` / `-white` | Software division: proposals, the Systems page, table stands |
+| `editsoul-icon-violet.svg` / `-black` / `-white` | Profile picture and app icon (the playhead i) |
+| `editsoul-systems-icon.svg` / `-violet` | Systems profile picture (the cursor i) |
+| `editsoul-mark.svg` / `editsoul-systems-mark.svg` | The symbol alone, transparent |
 | `favicon.svg` | Browser tab icon |
 
-Colors: black `#0B0A10`, violet `#5A2EFF`, lilac `#9C80FF` (violet on dark backgrounds), white `#F7F6FB`.
-Rebuild after changing colors: `FONT_DIR=path/to/woff2 python3 brand/generate.py`.
+Colors: black `#0B0A10`, violet `#5A2EFF`, lilac `#9C80FF` (violet on dark), white `#F7F6FB`.
+Rebuild: `FONT_DIR=path/to/fonts python3 brand/generate.py` (needs the Geist and Geist Mono .woff2 files, fonttools and brotli).
 
 ## Edit the content
 
