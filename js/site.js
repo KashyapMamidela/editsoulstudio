@@ -72,6 +72,7 @@ if (filters) {
 /* ---------- Kits (rendered where [data-kits] is) ---------- */
 document.querySelectorAll('[data-kits]').forEach(box => {
   const door = box.dataset.kits;
+  box.textContent = '';
   KITS.filter(k => !door || door === 'all' || k.doors.includes(door)).forEach(k => {
     const el = document.createElement('article');
     el.className = 'kit'; el.id = 'kit-' + k.id; el.setAttribute('data-reveal', '');
