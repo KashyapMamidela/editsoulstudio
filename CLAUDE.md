@@ -1,46 +1,58 @@
-# Edit Soul — project notes for Claude Code
+# Edit Soul Studio — project notes for Claude Code
 
-Website for **Edit Soul**, run by Kashyap and Yashu Singh in Nellore, Andhra Pradesh. Domain: `editsoulstudio.in`. Instagram: `@editsoulstudio.in`.
+Website for **Edit Soul Studio**, one creative studio in Nellore, Andhra Pradesh. Domain `editsoulstudio.in`, Instagram `@editsoulstudio.in`.
 
-The company has two divisions under one brand:
-- **Edit Soul Studio** — content: video editing, color, sound, reels, AI videos, animated/faceless videos, content writing, instant reels, photo/video shoots, post-production partner for short films and YouTube series.
-- **Edit Soul Systems** — software for local businesses, "software, stitched to fit". First product: **Serve by Edit Soul** (working name), a restaurant QR menu + table ordering + waiter app + admin dashboard, built with Vamsi.
+**Positioning (Nov 2026):** one all-in-one studio for everything people see of a business, a creator or a person. No separate divisions. Hero: giant **STAND OUT** + "One studio for everything people see of your business."
+**Team on the site:** Kashyap, Co-founder & CEO · Yashu Singh, Co-founder (photo placeholders until real photos arrive). Nobody else.
+**No prices** anywhere on the site. Copy must be plain enough for anyone to understand.
+
+## Structure: four doors
+
+| Page | Door | Verb |
+| --- | --- | --- |
+| `content/` | Content | Get noticed: reels, editing, shoots, AI video, writing |
+| `brand-web/` | Brand & Web | Look the part: identity, websites, print |
+| `growth/` | Growth | Get found: Google profile, SEO/AI search, social, channel growth, ads |
+| `systems/` | Systems | Run smoother: custom software, QR menu + table ordering first |
+
+Plus `index.html` (home), `work/`, `studio/` (about, founders), `start/` (guided brief → WhatsApp).
+Nav: Content · Brand & Web · Growth · Systems · Work + "Start a project". The same four keys are used everywhere (nav, filters, kits, brief).
 
 ## Stack
 
-Plain static site, no build step: `index.html`, `css/style.css`, `js/main.js`. three.js 0.160 and Lenis load from jsDelivr via an import map / script tag. Hosted on GitHub Pages from `main`.
+Plain static site on GitHub Pages from `main`. No framework, no build step.
+- `css/style.css` — all tokens (type scale, 8px spacing, grid, easing) and components.
+- `js/data.js` — **edit content here**: `WHATSAPP` (still `91XXXXXXXXXX`), `INSTAGRAM`, `DOORS`, `WORK`, `KITS`, `BRIEF`.
+- `js/site.js` — Lenis + GSAP/ScrollTrigger/SplitText (jsDelivr, pinned 3.13.0), scroll playhead, scroll-driven scenes, work cards, kits, brief.
+- `js/reel.js` — three.js film reel (home only, via import map). `js/stills.js` — placeholder thumbnails.
+- `partials/` — shared head, header, footer, logo. After editing them run `node tools/sync.mjs` to copy them into every page (between `<!-- name:start/end -->` markers). Pages use relative paths so the site works at a sub-path.
+- `sitemap.xml`, `robots.txt`; home has ProfessionalService JSON-LD.
 
-Run locally: `npx serve .` (ES modules don't work from `file://`).
+Run locally: `npx serve .` (ES modules don't work from `file://`). `.claude/launch.json` has a `site` config on port 3000.
 
-`node build.mjs` writes `dist/editsoulstudio.html` (single file) and `dist/fragment.html`. `dist/` is git-ignored.
+## How the motion works
 
-## How the page works
-
-- **Depth layers** (z-index): `#glBack` (0) < `.back` giant type (1) < `#glFront` (2) < `.front` content (3) < grain (4) < nav (20). Sections must not create stacking contexts (no z-index/transform/opacity on `section`), or the weave breaks.
-- **The reel**: a 3D film strip (three.js) that weaves through the giant words. Two WebGL renderers draw the same scene; `rBack` is clipped to z ≤ 0, `rFront` to z ≥ 0. It anchors to any element with `data-reel` (hero `SOUL`, contact `LET'S MAKE IT`). Frames come from `WORK`; hover pauses, click opens `link`, scroll scrubs.
-- **Content to edit** is in the marked block at the top of `js/main.js`: `WHATSAPP` (still a placeholder `91XXXXXXXXXX`), `INSTAGRAM`, `CHOICES` (the "What are you making?" list), `WORK` (portfolio; add `thumb: 'media/x.jpg'` for real images).
-- Contact form opens WhatsApp (`wa.me`) with the message pre-filled.
-- Other pieces: variable-font lens on the hero word, marquee, hand-drawn SVG marks (`.scrib`) drawn on reveal, rotating badge, cursor peek on the chooser, tilting work cards, custom cursor with `data-cursor` labels.
-- Must keep working on phones (390px wide), with WebGL off, and with `prefers-reduced-motion`.
+- Scroll is the timeline. Desktop (≥1021px): hero word scrubs width/weight, "four tracks → one cut" scene is pinned, door cards stack (sticky), work reel scrolls sideways (pinned) with counters, process line draws, portraits wipe in, Systems before/after scene is pinned.
+- Phones: no pinning or horizontal hijack; work reel swipes natively; door cards scroll normally.
+- `prefers-reduced-motion`: no Lenis, no scrub or pin, short fades only; the reel holds still.
+- Content is visible without JS (scenes default to stacked layouts; JS adds `.is-hscroll` / `.is-scene`). Work cards, kits and the brief need JS; work and brief have fallbacks.
+- **Depth layers (home):** `#glBack` (0) < `.back` giant type (1) < `#glFront` (2) < content (3). Sections holding `.back` (hero, contact) must never be pinned or given transform/opacity/z-index, or the weave breaks.
 
 ## Design system
 
-- Colors: white `#F7F6FB`, black `#0B0A10`, violet `#5A2EFF`, lilac `#9C80FF` (violet on dark). Light theme only, by choice.
-- Type: Anybody (display, variable width), Newsreader italic (voice), Geist (body), Geist Mono (labels).
-- Logo: **the playhead i** — in `editsoul` the i is a violet line; Studio gets a playhead head, Systems a cursor block. Files in `brand/`, regenerated by `brand/generate.py`. Header uses `editsoul-wordmark.svg` inline, footer `editsoul-logo.svg` inline (black replaced with `currentColor`).
-- Copy: plain, client-first ("you get", "we need from you"). No AI-slop look: no generic gradients, emoji bullets or template cards.
+Colors: white `#F7F6FB`, black `#0B0A10`, violet `#5A2EFF`, lilac `#9C80FF`. Light theme only.
+Type: Anybody (display, variable `wdth`/`wght`), Newsreader italic (voice), Geist (body), Geist Mono (labels). Only use the `--t-*` and `--s-*` tokens.
+Logo: the playhead i (`partials/logo.svg`, from `brand/`). The Studio/Systems division logos in `brand/` are retired.
 
-## Next up (from the Systems expansion plan)
+## Placeholders still to fill
 
-1. **Systems section / page** (`/systems`): hero "Readymade is for shirts. Your business deserves software stitched to fit." with a phone mock-up of a branded QR menu; a live "Scan this" demo QR; before/after (paper menu → order on kitchen screen); what we build (restaurants & hotels first, then clinics, coaching/schools, shops/salons); how we work (Visit → Map your flow → Build in your brand → Train your staff → Stay on call); packages (Starter ₹9,999 + ₹499/mo, Signature ₹24,999 + ₹1,199/mo, Signature + Growth ₹34,999, Custom); "no per-order commission", "no hardware lock-in"; case studies.
-2. Nav: **Studio | Systems | Work | Contact**. Hero should show both sides (a reel and a QR menu).
-3. Telugu / English toggle.
-4. Team: add Vamsi once his role is settled.
-5. Animate the logo i: blink the cursor block on the Systems page.
-6. Replace placeholders: WhatsApp number, real work links and thumbnails, Yashu's specialty, real photos.
+WhatsApp number and reply hours · real work links, thumbnails and confirmed view counts (Baahubali shows 241K, older copy said 300K) · founder photos (put in `media/`, swap the `.portrait` placeholder for an `<img>`) · Yashu's specialty · Serve demo link · which kits to keep.
+
+## Skills
+
+`.claude/skills` is restored from `skills-lock.json` (`npx skills experimental_install`): Emil Kowalski motion skills, UX (cuellarfr/design-skills, impeccable, web-design-guidelines), copy/CRO/SEO (coreyhaines31/marketingskills), frontend-design, webapp-testing. Run `review-animations` on motion changes.
 
 ## Conventions
 
 - Commit messages end with a `Co-Authored-By` line for Claude.
-- Keep files plain HTML/CSS/JS unless there's a clear reason to add a framework.
-- Test visually at 1440px and 390px before pushing.
+- Test at 1440px and 390px, with reduced motion, and check the console before pushing.
