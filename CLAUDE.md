@@ -3,7 +3,7 @@
 Website for **Edit Soul Studio**, one creative studio in Nellore, Andhra Pradesh. Domain `editsoulstudio.in`, Instagram `@editsoulstudio.in`.
 
 **Positioning (Nov 2026):** one all-in-one studio for everything people see of a business, a creator or a person. No separate divisions. Hero: giant **STAND OUT** + "One studio for everything people see of your business."
-**Team on the site:** Kashyap, Co-founder & CEO · Yashu Singh, Co-founder (photo placeholders until real photos arrive). Nobody else.
+**Team on the site:** Kashyap, Co-founder & CEO · Yashu Singh, Co-founder (initials until real photos arrive; Instagram @kashyap_grit, @yashusingh_28). Nobody else.
 **No prices** anywhere on the site. Copy must be plain enough for anyone to understand.
 
 ## Structure: four doors
@@ -46,7 +46,7 @@ Logo: the playhead i (`partials/logo.svg`, from `brand/`). The Studio/Systems di
 
 ## Placeholders still to fill
 
-WhatsApp number and reply hours · real work links, thumbnails and confirmed view counts (Baahubali shows 241K, older copy said 300K) · founder photos (portraits show initials K / Y for now; put photos in `media/` and add an `<img>` inside `.portrait`). Founder Instagram: @kashyap_grit (spelling to confirm), @yashusingh_28 · Yashu's specialty · Serve demo link · which kits to keep.
+WhatsApp number and reply hours · real work links, thumbnails and confirmed view counts (Baahubali shows 241K, older copy said 300K) · founder photos (portraits show initials K / Y for now; put photos in `media/` and add an `<img>` inside `.portrait`). Founder Instagram: Yashu's specialty · Serve demo link · which kits to keep.
 
 ## Skills
 
