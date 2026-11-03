@@ -46,7 +46,7 @@ Logo: the playhead i (`partials/logo.svg`, from `brand/`). The Studio/Systems di
 
 ## Placeholders still to fill
 
-WhatsApp number and reply hours · real work links, thumbnails and confirmed view counts (Baahubali shows 241K, older copy said 300K) · founder photos (put in `media/`, swap the `.portrait` placeholder for an `<img>`) · Yashu's specialty · Serve demo link · which kits to keep.
+WhatsApp number and reply hours · real work links, thumbnails and confirmed view counts (Baahubali shows 241K, older copy said 300K) · founder photos (portraits show initials K / Y for now; put photos in `media/` and add an `<img>` inside `.portrait`). Founder Instagram: @kashyap_grit (spelling to confirm), @yashusingh_28 · Yashu's specialty · Serve demo link · which kits to keep.
 
 ## Skills
 
